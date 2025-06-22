@@ -2,7 +2,7 @@
 
 This project performs exploratory data analysis (EDA) on historical weather data to understand relationships between key weather parameters, detect outliers, and visualize trends.
 
-📌 Project Highlights
+Project Highlights:
  Loaded and cleaned the dataset (handled missing values, removed outliers).
  Computed correlation matrices to study relationships between weather features.
  Visualized:
