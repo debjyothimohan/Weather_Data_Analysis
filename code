@@ -1,0 +1,72 @@
+import pandas as pd
+import numpy as np
+import matplotlib.pyplot as plt
+
+# Load the CSV file
+df = pd.read_csv('weatherHistory.csv')
+print(df.head())
+
+# Check missing data
+print(df.isnull().sum())
+
+# Drop missing values for simplicity
+df = df.dropna()
+
+# Select relevant columns (customize as needed)
+cols = ['Temperature (C)', 'Apparent Temperature (C)', 'Humidity', 'Wind Speed (km/h)', 'Pressure (millibars)']
+weather = df[cols]
+corr_matrix = weather.corr()
+print("Correlation Matrix:")
+print(corr_matrix)
+
+import matplotlib.pyplot as plt
+
+# Heatmap
+plt.figure(figsize=(8,6))
+plt.imshow(corr_matrix, cmap='coolwarm', interpolation='none')
+plt.colorbar()
+plt.xticks(range(len(cols)), cols, rotation=45)
+plt.yticks(range(len(cols)), cols)
+plt.title('Correlation Heatmap')
+plt.show()
+
+# Scatter plot: Temperature vs Apparent Temperature (highest correlation)
+plt.figure(figsize=(6,4))
+plt.scatter(weather['Temperature (C)'], weather['Apparent Temperature (C)'], alpha=0.3)
+plt.xlabel('Temperature (C)')
+plt.ylabel('Apparent Temperature (C)')
+plt.title('Temperature vs Apparent Temperature')
+plt.show()
+
+# Scatter plot: Humidity vs Wind Speed (for comparison)
+plt.figure(figsize=(6,4))
+plt.scatter(weather['Humidity'], weather['Wind Speed (km/h)'], alpha=0.3)
+plt.xlabel('Humidity')
+plt.ylabel('Wind Speed (km/h)')
+plt.title('Humidity vs Wind Speed')
+plt.show()
+
+# For Temperature, filter out values beyond 3 standard deviations
+z_scores = np.abs((weather['Temperature (C)'] - weather['Temperature (C)'].mean()) / weather['Temperature (C)'].std())
+weather_clean = weather[z_scores < 3]
+
+# Correlation after removing outliers
+print("Correlation Matrix after Outlier Removal:")
+print(weather_clean.corr())
+
+# Simple pairplot using pandas
+pd.plotting.scatter_matrix(weather, figsize=(10, 8), diagonal='kde', alpha=0.2)
+plt.suptitle('Pairwise Feature Relationships')
+plt.show()
+
+weather['FeelsLike_Delta'] = weather['Temperature (C)'] - weather['Apparent Temperature (C)']
+
+# See how this delta correlates with other features
+print(weather.corr()['FeelsLike_Delta'])
+
+monthly_means = df.groupby('Formatted Date')[cols].mean()
+monthly_means.plot(kind='line', marker='o', figsize=(10, 6))
+plt.title('Monthly Average Weather Features')
+plt.ylabel('Value')
+plt.xlabel('Month')
+plt.show()
